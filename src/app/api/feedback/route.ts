@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getScenario } from "@/lib/scenarios";
-import { hasApiKey, chatCompletion, type ChatMessage } from "@/lib/openai";
+import { hasApiKey, chatCompletion, type ChatMessage } from "@/lib/llm";
 import { getMockFeedback } from "@/lib/mock";
 
 export const runtime = "nodejs";
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
         "結束前主動問對方一個問題，對話會更自然。",
       ],
       demoMode: !hasApiKey(),
+      provider: hasApiKey() ? "grok" : "demo",
     });
   }
 
@@ -39,19 +40,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       tips: getMockFeedback(scenario),
       demoMode: true,
+      provider: "demo",
     });
   }
 
   const transcript = messages
-    .map((m) => `${m.role === "user" ? "Learner" : scenario.partnerName}: ${m.content}`)
+    .map(
+      (m) =>
+        `${m.role === "user" ? "Learner" : scenario.partnerName}: ${m.content}`
+    )
     .join("\n");
 
   const prompt: ChatMessage[] = [
     {
       role: "system",
-      content: `You are an encouraging English coach for Hong Kong learners (Cantonese speakers).
+      content: `You are an encouraging English coach for Hong Kong learners practising formal British English.
 Given a practice dialogue, write 3 to 5 concrete, actionable feedback tips in Traditional Chinese (zh-Hant).
-Focus on grammar, vocabulary, and more natural phrasing — based on what the learner actually said.
+Focus on grammar, vocabulary, and more natural formal British phrasing (colour, favour, organise; polite register) — based on what the learner actually said.
 No scores, no percentages, no vague praise. Each tip should be one clear sentence.
 Return ONLY a JSON array of strings, e.g. ["提示1","提示2","提示3"].`,
     },
@@ -65,7 +70,10 @@ Return ONLY a JSON array of strings, e.g. ["提示1","提示2","提示3"].`,
     const raw = await chatCompletion(prompt, { temperature: 0.4 });
     let tips: string[] = [];
     try {
-      const cleaned = raw.replace(/^```json?\s*/i, "").replace(/```$/i, "").trim();
+      const cleaned = raw
+        .replace(/^```json?\s*/i, "")
+        .replace(/```$/i, "")
+        .trim();
       const parsed = JSON.parse(cleaned);
       if (Array.isArray(parsed)) {
         tips = parsed.map(String).filter(Boolean).slice(0, 5);
@@ -80,11 +88,20 @@ Return ONLY a JSON array of strings, e.g. ["提示1","提示2","提示3"].`,
     if (tips.length < 3) {
       tips = [...tips, ...getMockFeedback(scenario)].slice(0, 4);
     }
-    return NextResponse.json({ tips, demoMode: false });
+    return NextResponse.json({
+      tips,
+      demoMode: false,
+      provider: "grok",
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Feedback failed";
     return NextResponse.json(
-      { error: message, tips: getMockFeedback(scenario), demoMode: false },
+      {
+        error: message,
+        tips: getMockFeedback(scenario),
+        demoMode: false,
+        provider: "grok",
+      },
       { status: 502 }
     );
   }

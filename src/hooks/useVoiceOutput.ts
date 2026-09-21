@@ -16,12 +16,14 @@ type Options = {
   demoMode: boolean;
 };
 
-export function useVoiceOutput({ demoMode }: Options) {
+/**
+ * Browser en-GB TTS only (xAI has no TTS; OpenAI speech removed).
+ */
+export function useVoiceOutput({ demoMode: _demoMode }: Options) {
   const [muted, setMuted] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
   const [speaking, setSpeaking] = useState(false);
   const [ready, setReady] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const unlockedRef = useRef(false);
 
   useEffect(() => {
@@ -56,22 +58,16 @@ export function useVoiceOutput({ demoMode }: Options) {
 
   const stop = useCallback(() => {
     stopBrowserSpeech();
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current = null;
-    }
     setSpeaking(false);
   }, []);
 
-  /** Call from a user gesture to unlock iOS audio. */
   const unlockAudio = useCallback(() => {
     if (unlockedRef.current) return;
     unlockedRef.current = true;
     if (isSpeechSynthesisSupported()) {
-      // Silent utterance unlocks speechSynthesis on some iOS versions
       const u = new SpeechSynthesisUtterance(" ");
       u.volume = 0;
+      u.lang = "en-GB";
       window.speechSynthesis.speak(u);
       window.speechSynthesis.cancel();
     }
@@ -87,36 +83,6 @@ export function useVoiceOutput({ demoMode }: Options) {
       stop();
       setSpeaking(true);
 
-      // Prefer OpenAI TTS when API key present (server returns 503 in demo)
-      if (!demoMode) {
-        try {
-          const res = await fetch("/api/speech", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text }),
-          });
-          if (res.ok) {
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
-            audioRef.current = audio;
-            audio.onended = () => {
-              URL.revokeObjectURL(url);
-              setSpeaking(false);
-            };
-            audio.onerror = () => {
-              URL.revokeObjectURL(url);
-              setSpeaking(false);
-            };
-            await audio.play();
-            return;
-          }
-          // fall through to browser TTS
-        } catch {
-          // fall through
-        }
-      }
-
       if (!isSpeechSynthesisSupported()) {
         setSpeaking(false);
         return;
@@ -126,7 +92,7 @@ export function useVoiceOutput({ demoMode }: Options) {
         onerror: () => setSpeaking(false),
       });
     },
-    [muted, autoPlay, demoMode, stop]
+    [muted, autoPlay, stop]
   );
 
   useEffect(() => () => stop(), [stop]);

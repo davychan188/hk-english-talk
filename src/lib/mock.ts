@@ -2,34 +2,34 @@ import type { Scenario } from "./scenarios";
 
 const mockReplies: Record<string, string[]> = {
   "coffee-shop": [
-    "Nice choice! Would you like that for here or to go? And any milk preference — oat, soy, or regular?",
-    "Coming right up. It's pretty busy this morning — do you work nearby?",
-    "Ha, yeah Central is always buzzing. By the way, if you ever want something sweeter, our honey latte is popular.",
-    "Sounds good! Anything else I can get you while you wait?",
+    "Certainly. Would you like that for here or to take away? And which milk would you prefer — oat, soya, or regular?",
+    "Of course — coming right up. It's rather busy this morning. Do you work nearby?",
+    "Yes, Central does keep one on one's toes. By the way, if you'd prefer something a little sweeter, our honey latte is quite popular.",
+    "Very good. Is there anything else I can get for you while you wait?",
   ],
   "job-interview": [
-    "Thanks for sharing that. What would you say is a strength you bring to a team?",
-    "That's helpful. Can you tell me about a time you had to handle a tight deadline?",
-    "Interesting. Why are you interested in this role specifically?",
-    "Great. Do you have any questions for me about the team or the company?",
+    "Thank you for sharing that. What would you say is a particular strength you bring to a team?",
+    "That's helpful. Could you tell me about a time you had to manage a tight deadline?",
+    "Interesting. Why are you interested in this role in particular?",
+    "Excellent. Do you have any questions for me about the team or the organisation?",
   ],
   "mtr-directions": [
-    "Sure! Take the Island Line toward Chai Wan — it's about three stops. Get off at Causeway Bay, Exit A.",
-    "No worries. If you need the Star Ferry instead, hop on the Tsuen Wan Line to Central, then follow the signs to Pier 7.",
-    "Yep, you're on the right track. The next train should be in about two minutes.",
-    "Happy to help! Need anything else — like which exit for Times Square?",
+    "Certainly. Take the Island Line towards Chai Wan — about three stops. Alight at Causeway Bay, Exit A.",
+    "Not at all. If you need the Star Ferry instead, take the Tsuen Wan Line to Central, then follow the signs to Pier 7.",
+    "Yes, you're on the right track. The next train should be along in about two minutes.",
+    "Happy to help. Is there anything else — for example, which exit for Times Square?",
   ],
   "new-colleagues": [
-    "Glad to hear it! Lunch tip: there's a solid cha chaan teng downstairs if you want something quick.",
-    "Ha, yeah the onboarding docs are a lot. Feel free to ping me anytime if something's confusing.",
-    "We usually grab coffee around 3 if you want to join. No pressure though!",
-    "Nice — you'll settle in fast. Want me to intro you to a few people on the team?",
+    "I'm glad to hear it. For lunch, there's a reliable cha chaan teng downstairs if you'd like something quick.",
+    "Quite — the onboarding materials are a fair amount to take in. Please do feel free to ask me if anything is unclear.",
+    "We often take coffee around three if you'd care to join. No pressure at all, of course.",
+    "Wonderful — I'm sure you'll settle in quickly. Would you like me to introduce you to a few people on the team?",
   ],
   "dim-sum": [
-    "Let's get har gow and cha siu bao for sure. You still like spring rolls?",
-    "Same here — work's been hectic. At least we made it to yum cha this weekend!",
-    "Haha true. Want to share a plate of cheung fun? The shrimp one's really good here.",
-    "Perfect. Next round's on me if you pick the tea!",
+    "Let's order har gow and char siu bao, shall we? Do you still fancy spring rolls?",
+    "Same here — work has been rather hectic. At least we've made it to yum cha this weekend.",
+    "Quite right. Shall we share a plate of cheung fun? The prawn one is particularly good here.",
+    "Perfect. The next round is on me if you choose the tea.",
   ],
 };
 
@@ -45,10 +45,13 @@ export function getMockReply(
   let tip = "";
   if (lower.includes("i want") && !lower.includes("i'd like")) {
     tip =
-      "\n\n💡 小提示：「I'd like…」比「I want…」更自然、更有禮貌。";
+      "\n\n💡 小提示：正式場合用「I'd like…」比「I want…」更有禮貌（英式慣用）。";
   } else if (lower.includes("how to go") || lower.includes("how go")) {
     tip =
       "\n\n💡 小提示：問路可說「How do I get to…?」或「Could you tell me the way to…?」。";
+  } else if (/\bcolor\b|\bfavor\b|\borganize\b/i.test(userMessage)) {
+    tip =
+      "\n\n💡 小提示：英式拼法為 colour／favour／organise。";
   } else if (turnIndex === 1) {
     tip =
       "\n\n💡 小提示：回覆時加一點細節（例如原因或感受），對話會更自然。";
@@ -59,9 +62,9 @@ export function getMockReply(
 
 export function getMockFeedback(scenario: Scenario): string[] {
   return [
-    `試多用完整句子回答，例如「I'd like a flat white, please」而不是單字。`,
-    `可以用「Could you…?」或「Would you mind…?」讓請求聽起來更自然。`,
-    `練習銜接語：如「Actually…」「By the way…」「That sounds great」讓對話更流暢。`,
+    `試多用完整、禮貌的句子，例如「I'd like a flat white, please」而不是單字。`,
+    `可以用「Could you…?」或「Would you mind…?」讓請求聽起來更正式、自然。`,
+    `練習銜接語：如「Actually…」「By the way…」「That sounds lovely」讓對話更流暢。`,
     `在「${scenario.title}」情境中，記得回覆對方的問題，再主動加一句相關話題。`,
   ];
 }

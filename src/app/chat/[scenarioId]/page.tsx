@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getScenario } from "@/lib/scenarios";
-import { hasApiKey } from "@/lib/openai";
+import { hasApiKey } from "@/lib/llm";
 import { ChatUI } from "@/components/ChatUI";
 import { SetupBanner } from "@/components/SetupBanner";
 

@@ -3,9 +3,9 @@ import { getScenario } from "@/lib/scenarios";
 import {
   hasApiKey,
   streamChatCompletion,
-  openAiSseToTextStream,
+  sseToTextStream,
   type ChatMessage,
-} from "@/lib/openai";
+} from "@/lib/llm";
 import { getMockReply, mockStreamText } from "@/lib/mock";
 
 export const runtime = "nodejs";
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "X-Demo-Mode": "true",
+        "X-Provider": "demo",
         "Cache-Control": "no-cache",
       },
     });
@@ -70,14 +71,15 @@ export async function POST(req: NextRequest) {
   ];
 
   try {
-    const openaiRes = await streamChatCompletion(history);
-    if (!openaiRes.body) {
-      throw new Error("No response body from OpenAI");
+    const grokRes = await streamChatCompletion(history);
+    if (!grokRes.body) {
+      throw new Error("No response body from Grok");
     }
-    const textStream = openAiSseToTextStream(openaiRes.body);
+    const textStream = sseToTextStream(grokRes.body);
     return new Response(textStream, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
+        "X-Provider": "grok",
         "Cache-Control": "no-cache",
       },
     });

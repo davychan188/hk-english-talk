@@ -1,7 +1,7 @@
 import { scenarios } from "@/lib/scenarios";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { SetupBanner } from "@/components/SetupBanner";
-import { hasApiKey } from "@/lib/openai";
+import { hasApiKey } from "@/lib/llm";
 
 export default function HomePage() {
   const demoMode = !hasApiKey();

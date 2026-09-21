@@ -1,4 +1,4 @@
-/** Browser speech helpers (Web Speech API). Client-only. */
+/** Browser speech helpers (Web Speech API). Client-only — formal British English. */
 
 export type SpeechRecognitionLike = {
   lang: string;
@@ -45,17 +45,25 @@ export function isSpeechSynthesisSupported(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
-/** Prefer an English voice for practice partners. */
-export function pickEnglishVoice(): SpeechSynthesisVoice | null {
+/** Prefer a British English voice (en-GB). */
+export function pickBritishVoice(): SpeechSynthesisVoice | null {
   if (!isSpeechSynthesisSupported()) return null;
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return null;
   const prefer = [
     (v: SpeechSynthesisVoice) =>
-      v.lang.startsWith("en-GB") && /female|samantha|karen|moira|fiona/i.test(v.name),
-    (v: SpeechSynthesisVoice) => v.lang.startsWith("en-US") && /samantha|female/i.test(v.name),
+      v.lang.startsWith("en-GB") &&
+      /google uk english female|uk english female/i.test(v.name),
+    (v: SpeechSynthesisVoice) =>
+      v.lang.startsWith("en-GB") &&
+      /google uk english male|uk english male|daniel|serena|martha|libby|siri.*british/i.test(
+        v.name
+      ),
+    (v: SpeechSynthesisVoice) =>
+      v.lang.startsWith("en-GB") && /female/i.test(v.name),
     (v: SpeechSynthesisVoice) => v.lang.startsWith("en-GB"),
-    (v: SpeechSynthesisVoice) => v.lang.startsWith("en-US"),
+    (v: SpeechSynthesisVoice) =>
+      /british|en.gb|england|uk english/i.test(`${v.lang} ${v.name}`),
     (v: SpeechSynthesisVoice) => v.lang.startsWith("en"),
   ];
   for (const pred of prefer) {
@@ -64,6 +72,9 @@ export function pickEnglishVoice(): SpeechSynthesisVoice | null {
   }
   return voices[0] ?? null;
 }
+
+/** @deprecated Use pickBritishVoice */
+export const pickEnglishVoice = pickBritishVoice;
 
 /** Strip zh-Hant tip lines before speaking. */
 export function textForSpeech(content: string): string {
@@ -85,10 +96,13 @@ export function speakWithBrowser(
   }
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US";
-  u.rate = 0.95;
-  const voice = pickEnglishVoice();
-  if (voice) u.voice = voice;
+  u.lang = "en-GB";
+  u.rate = 0.92;
+  const voice = pickBritishVoice();
+  if (voice) {
+    u.voice = voice;
+    if (voice.lang) u.lang = voice.lang;
+  }
   u.onend = () => options?.onend?.();
   u.onerror = () => options?.onerror?.();
   window.speechSynthesis.speak(u);
@@ -112,7 +126,6 @@ export function ensureVoicesLoaded(): Promise<void> {
       resolve();
     };
     window.speechSynthesis.addEventListener("voiceschanged", handler);
-    // Fallback timeout
     setTimeout(() => {
       window.speechSynthesis.removeEventListener("voiceschanged", handler);
       resolve();

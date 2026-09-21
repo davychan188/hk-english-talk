@@ -13,17 +13,17 @@ export function SetupBanner({ demoMode }: Props) {
         <span className="font-semibold">示範模式／Demo mode：</span>
         尚未設定{" "}
         <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs">
-          OPENAI_API_KEY
+          XAI_API_KEY
         </code>{" "}
         （或{" "}
         <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs">
-          AI_API_KEY
+          GROK_API_KEY
         </code>
-        ）。介面可完整預覽；對話為模擬回覆。於專案根目錄建立{" "}
+        ）。介面可完整預覽；對話與文法建議為模擬回覆。於專案根目錄建立{" "}
         <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs">
           .env.local
         </code>{" "}
-        並加入金鑰後重啟即可使用真實 AI 串流回覆。
+        並加入 xAI 金鑰後重啟即可使用 Grok 串流對話。語音輸入／播放使用瀏覽器英式英語（en-GB），無需金鑰。
       </p>
     </div>
   );

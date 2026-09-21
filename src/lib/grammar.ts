@@ -36,7 +36,7 @@ export function getMockGrammarTips(text: string): GrammarTip[] {
     tips.push({
       original: trimmed.match(/\bi\s+want\b/i)?.[0] ?? "I want",
       suggestion: "I'd like",
-      reasonZh: "點餐或請求時，「I'd like…」比「I want…」更自然、更有禮貌。",
+      reasonZh: "正式／英式口語中，「I'd like…」比「I want…」更有禮貌。",
       level: "minor",
     });
   }
@@ -112,7 +112,33 @@ export function getMockGrammarTips(text: string): GrammarTip[] {
     });
   }
 
+  if (/\bcolor\b/i.test(trimmed)) {
+    tips.push({
+      original: "color",
+      suggestion: "colour",
+      reasonZh: "英式拼法用 colour（不是 color）。",
+      level: "minor",
+    });
+  }
+  if (/\bfavor\b/i.test(trimmed) && !/\bfavour\b/i.test(trimmed)) {
+    tips.push({
+      original: "favor",
+      suggestion: "favour",
+      reasonZh: "英式拼法為 favour。",
+      level: "minor",
+    });
+  }
+  if (/\borganize\b/i.test(trimmed)) {
+    tips.push({
+      original: "organize",
+      suggestion: "organise",
+      reasonZh: "英式拼法通常寫 organise。",
+      level: "minor",
+    });
+  }
+
   if (tips.length === 0) {
+
     // Short natural-looking utterance → praise
     const wordCount = trimmed.split(/\s+/).length;
     if (wordCount >= 3 && !/[，。？！、]/.test(trimmed)) {

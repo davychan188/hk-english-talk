@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getScenario } from "@/lib/scenarios";
-import { hasApiKey, chatCompletion, type ChatMessage } from "@/lib/openai";
+import { hasApiKey, chatCompletion, type ChatMessage } from "@/lib/llm";
 import {
   getMockGrammarTips,
   type GrammarTip,
@@ -62,16 +62,17 @@ export async function POST(req: NextRequest) {
   const messages: ChatMessage[] = [
     {
       role: "system",
-      content: `You are an English coach for Hong Kong learners (Cantonese speakers), Speak/Toko style.
-Analyze ONE learner utterance for grammar, articles, tense, prepositions, and natural spoken English.
+      content: `You are an English coach for Hong Kong learners (Cantonese speakers), Speak/Toko style, teaching formal British English.
+Analyze ONE learner utterance for grammar, articles, tense, prepositions, and natural formal British English.
+Prefer British spelling and phrasing in suggestions (colour, favour, organise, learnt, queue centre; "I'd like…" over casual American slang).
 Return ONLY a JSON object: {"tips":[{"original":"...","suggestion":"...","reasonZh":"...","level":"good"|"minor"|"important"}]}
 Rules:
 - 0–3 tips max. Prefer the most useful 1–2.
 - "original" = the problematic span (or full sentence if praising).
-- "suggestion" = a more natural alternative (same as original when level is "good").
+- "suggestion" = a more natural formal British alternative (same as original when level is "good").
 - "reasonZh" = one short Traditional Chinese explanation for HK users.
 - level "good": sentence is already natural — one praise tip, reasonZh like 「講得自然」.
-- level "minor": polish / politeness / natural phrasing.
+- level "minor": polish / politeness / natural British phrasing.
 - level "important": clear grammar/tense/article error that confuses meaning.
 - Do not invent issues. Do not score. No markdown.`,
     },

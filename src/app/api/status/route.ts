@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import { hasApiKey } from "@/lib/openai";
+import { getProvider, hasApiKey, DEFAULT_MODEL } from "@/lib/llm";
 
 export async function GET() {
+  const provider = getProvider();
   return NextResponse.json({
-    demoMode: !hasApiKey(),
-    model: process.env.OPENAI_MODEL || process.env.AI_MODEL || "gpt-4o-mini",
+    provider,
+    demoMode: provider === "demo" || !hasApiKey(),
+    model: provider === "grok" ? DEFAULT_MODEL : null,
+    stt: "browser",
+    tts: "browser-en-GB",
   });
 }
