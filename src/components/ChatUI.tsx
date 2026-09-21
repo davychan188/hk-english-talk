@@ -7,6 +7,7 @@ import type { UiMessage } from "@/lib/types";
 import { MessageBubble } from "./MessageBubble";
 import { FeedbackPanel } from "./FeedbackPanel";
 import { MicButton } from "./MicButton";
+import { GrammarTips } from "./GrammarTips";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { useVoiceOutput } from "@/hooks/useVoiceOutput";
 
@@ -61,16 +62,47 @@ export function ChatUI({ scenario, demoMode }: Props) {
       unlockRef.current();
       stopRef.current();
 
+      const userMsgId = uid();
       const userMsg: UiMessage = {
-        id: uid(),
+        id: userMsgId,
         role: "user",
         content: text,
         createdAt: Date.now(),
+        grammarLoading: true,
       };
       const nextMessages = [...messagesRef.current, userMsg];
       setMessages(nextMessages);
       setInput("");
       setStreaming(true);
+
+      // Grammar tips in parallel (non-blocking)
+      void (async () => {
+        try {
+          const gRes = await fetch("/api/grammar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text,
+              scenarioId: scenario.id,
+            }),
+          });
+          const gData = await gRes.json().catch(() => ({}));
+          const tips = Array.isArray(gData.tips) ? gData.tips : [];
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === userMsgId
+                ? { ...m, grammarTips: tips, grammarLoading: false }
+                : m
+            )
+          );
+        } catch {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === userMsgId ? { ...m, grammarLoading: false } : m
+            )
+          );
+        }
+      })();
 
       const assistantId = uid();
       setMessages((prev) => [
@@ -338,12 +370,15 @@ export function ChatUI({ scenario, demoMode }: Props) {
 
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {messages.map((m) => (
-          <div key={m.id} className="space-y-1">
+          <div key={m.id} className="space-y-1.5">
             <MessageBubble
               role={m.role}
               content={m.content || (streaming ? "…" : "")}
               partnerName={scenario.partnerName}
             />
+            {m.role === "user" && (
+              <GrammarTips tips={m.grammarTips} loading={m.grammarLoading} />
+            )}
             {m.role === "assistant" && m.content && !streaming && (
               <div className="flex justify-start pl-1">
                 <button
