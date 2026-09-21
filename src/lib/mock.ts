@@ -31,6 +31,18 @@ const mockReplies: Record<string, string[]> = {
     "Quite right. Shall we share a plate of cheung fun? The prawn one is particularly good here.",
     "Perfect. The next round is on me if you choose the tea.",
   ],
+  "football-chat": [
+    "I tend to favour Liverpool myself, though United have been rather spirited lately. Who do you usually support?",
+    "Quite — the atmosphere here on a Saturday evening is excellent. Shall we order a drink before kick-off?",
+    "Yes, that fixture should be competitive. Do you prefer watching at home, or out at a sports bar like this?",
+    "Agreed. If it ends in a draw, at least we'll have had a decent evening. Any predictions for the score?",
+  ],
+  "weekend-plans": [
+    "I might take a gentle hike on Hong Kong Island if the weather holds. What about you?",
+    "That sounds lovely. Brunch in Sai Ying Pun is rather pleasant at the weekend, if you fancy a recommendation.",
+    "Quite understandable — a quiet Sunday can be just as restorative. Do you have any series you're watching?",
+    "Wonderful. Perhaps we could compare notes on Monday — enjoy your weekend either way.",
+  ],
 };
 
 export function getMockReply(

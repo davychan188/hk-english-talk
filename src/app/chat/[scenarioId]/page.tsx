@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getScenario } from "@/lib/scenarios";
+import { getScenario, scenarios } from "@/lib/scenarios";
 import { hasApiKey } from "@/lib/llm";
 import { ChatUI } from "@/components/ChatUI";
 import { SetupBanner } from "@/components/SetupBanner";
@@ -24,11 +24,5 @@ export default async function ChatPage({ params }: Props) {
 }
 
 export function generateStaticParams() {
-  return [
-    { scenarioId: "coffee-shop" },
-    { scenarioId: "job-interview" },
-    { scenarioId: "mtr-directions" },
-    { scenarioId: "new-colleagues" },
-    { scenarioId: "dim-sum" },
-  ];
+  return scenarios.map((s) => ({ scenarioId: s.id }));
 }

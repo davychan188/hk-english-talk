@@ -136,6 +136,22 @@ export function getMockGrammarTips(text: string): GrammarTip[] {
       level: "minor",
     });
   }
+  if (/\bcenter\b/i.test(trimmed) && !/\bcentre\b/i.test(trimmed)) {
+    tips.push({
+      original: "center",
+      suggestion: "centre",
+      reasonZh: "英式拼法為 centre（不是 center）。",
+      level: "minor",
+    });
+  }
+  if (/\bprogram\b/i.test(trimmed) && !/\bprogramme\b/i.test(trimmed) && !/\b(computer|tv|television)\s+program\b/i.test(trimmed)) {
+    tips.push({
+      original: "program",
+      suggestion: "programme",
+      reasonZh: "指活動／節目時，英式拼法通常寫 programme。",
+      level: "minor",
+    });
+  }
 
   if (tips.length === 0) {
 

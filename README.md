@@ -52,7 +52,7 @@ Get a key at [console.x.ai](https://console.x.ai/). Never commit `.env.local`.
 
 ## MVP 功能 / What's in this MVP
 
-1. **Scenario picker** — 5 Hong Kong–flavoured scenarios; partners use formal British English.
+1. **Scenario picker** — 7 Hong Kong–flavoured scenarios (coffee shop, interview, MTR, colleagues, dim sum, **football / Premier League**, weekend plans); partners use formal British English.
 2. **Text chat** — Streaming Grok replies when keyed; optional brief zh-Hant tips (`💡 小提示`).
 3. **Grammar suggestions** — Speak-style tips (original → British natural phrasing, zh-Hant reason, good / minor / important).
 4. **Voice input (STT)** — Hold **🎤 按住說話**. Browser `SpeechRecognition` with **`en-GB`**. No server Whisper.

@@ -54,7 +54,13 @@ export function GrammarTips({ tips, loading }: Props) {
         return (
           <div
             key={i}
-            className={`rounded-xl border px-3 py-2.5 text-left shadow-sm ${style.border}`}
+            className={`rounded-xl border border-l-4 px-3 py-2.5 text-left shadow-sm ${style.border} ${
+              tip.level === "important"
+                ? "border-l-rose-400"
+                : tip.level === "good"
+                  ? "border-l-emerald-400"
+                  : "border-l-amber-400"
+            }`}
           >
             <div className="mb-1.5 flex items-center gap-2">
               <span
