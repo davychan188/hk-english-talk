@@ -33,7 +33,7 @@ export default function HomePage() {
         </section>
 
         <footer className="mt-12 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
-          MVP · 文字對話練習 · 語音功能稍後加入
+          MVP · 文字 + 語音對話練習
         </footer>
       </main>
     </>

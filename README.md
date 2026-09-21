@@ -3,6 +3,8 @@
 AI English conversation practice for Hong Kong learners.  
 UI chrome in Traditional Chinese; practice dialogue in English. Partners feel warm and natural — not textbook bots.
 
+Supports **text + voice**: speak with the mic, hear the partner reply.
+
 ---
 
 ## 快速開始 / Quick start
@@ -26,11 +28,13 @@ npm start
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `OPENAI_API_KEY` | No* | OpenAI API key for live streaming chat |
+| `OPENAI_API_KEY` | No* | Live chat, Whisper STT fallback, OpenAI TTS |
 | `AI_API_KEY` | No* | Alias for the same key |
 | `OPENAI_MODEL` / `AI_MODEL` | No | Defaults to `gpt-4o-mini` |
+| `OPENAI_TTS_MODEL` | No | Defaults to `tts-1` |
+| `OPENAI_TTS_VOICE` | No | Defaults to `nova` |
 
-\*Without a key, the app runs in **demo mode** with mock streaming replies so the full UI is reviewable.
+\*Without a key, the app runs in **demo mode**: mock chat replies + **browser** Web Speech STT/TTS (no server voice APIs). UI stays fully reviewable.
 
 Never commit `.env.local` or hardcode secrets.
 
@@ -38,10 +42,29 @@ Never commit `.env.local` or hardcode secrets.
 
 ## MVP 功能 / What's in this MVP
 
-1. **Scenario picker** — 5 Hong Kong–flavoured scenarios (coffee shop, office interview, MTR directions, new colleagues, dim sum). English title + Traditional Chinese description.
-2. **Text chat** — Streaming replies when an API key is set; stays in character; optional brief zh-Hant correction tips (`💡 小提示`).
-3. **End session feedback** — 3–5 concrete tips on grammar / vocab / natural phrasing. No fake scores.
-4. **Mobile-friendly** clean UI; no auth.
+1. **Scenario picker** — 5 Hong Kong–flavoured scenarios (coffee shop, office interview, MTR directions, new colleagues, dim sum).
+2. **Text chat** — Streaming replies when an API key is set; optional brief zh-Hant tips (`💡 小提示`).
+3. **Voice input (STT)** — Hold **🎤 按住說話**. Uses browser `SpeechRecognition` (`en-US`) with zero keys. Fallback: record → `/api/transcribe` (Whisper) when an API key is set.
+4. **Voice output (TTS)** — Auto-plays partner replies after streaming ends (toggle **靜音** / **自動播放**). Browser `speechSynthesis` in demo; `/api/speech` (OpenAI TTS) when keyed. Per-message **播放語音** button. Tips in Chinese are not spoken.
+5. **End session feedback** — 3–5 concrete tips. No fake scores.
+6. **Mobile-friendly** UI; no auth.
+
+---
+
+## 語音使用方式 / How to use voice
+
+1. Open a scenario.
+2. Tap **🔊 語音** if muted; leave **自動播放** on to hear replies.
+3. **Hold** the mic button, speak English, **release** to send.
+4. Or type and press **送出** as before.
+5. Tap **播放語音** under any partner message to hear it again.
+
+### Browser notes (especially iOS)
+
+- **Chrome / Edge (desktop & Android)**: Web Speech STT + TTS work best.
+- **Safari (macOS / iOS)**: `speechSynthesis` works after a user gesture; dictation/`SpeechRecognition` support is limited or unavailable on many iOS versions — use typing, or set an API key for Whisper mic fallback (MediaRecorder).
+- Mic and audio require **HTTPS** (or `localhost`) and microphone permission.
+- First tap on mic/send helps unlock audio on iOS.
 
 ---
 
@@ -51,25 +74,26 @@ Never commit `.env.local` or hardcode secrets.
 src/
   app/
     page.tsx                 # Home / scenario picker
-    chat/[scenarioId]/      # Practice chat
+    chat/[scenarioId]/      # Practice chat (+ voice)
     api/chat/                # Streaming LLM (or mock)
     api/feedback/            # End-of-session tips
-    api/status/              # Demo-mode flag
-  components/                # ChatUI, ScenarioCard, FeedbackPanel, …
+    api/transcribe/          # Whisper STT fallback
+    api/speech/              # OpenAI TTS
+    api/status/
+  components/                # ChatUI, MicButton, …
+  hooks/                     # useVoiceInput, useVoiceOutput
   lib/
-    scenarios.ts             # Scenario data + prompts
-    openai.ts                # API key helper + OpenAI client
-    mock.ts                  # Demo replies & tips
+    scenarios.ts | openai.ts | mock.ts | speech-client.ts
 ```
 
 ---
 
 ## 下一步 / Next steps
 
-- Voice input / output (speech-to-text + TTS)
-- Persist session history (localStorage or DB)
+- Better iOS STT (always-on Whisper path UX)
+- Persist session history
 - More scenarios & difficulty levels
-- Deploy (Vercel recommended — set `OPENAI_API_KEY` in project env)
+- Deploy on Vercel — set `OPENAI_API_KEY` in project env
 
 ---
 
